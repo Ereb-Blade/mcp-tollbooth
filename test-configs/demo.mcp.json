@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user"]
+    },
+    "sketchy-tool": {
+      "command": "npx",
+      "args": ["-y", "some-totally-made-up-mcp-server-that-does-not-exist-12345"]
+    },
+    "remote-example": {
+      "url": "https://mcp.example.com/sse",
+      "transport": "sse"
+    }
+  }
+}

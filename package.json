@@ -1,0 +1,41 @@
+{
+  "name": "mcp-tollbooth",
+  "version": "0.1.0",
+  "description": "How much context are your MCP servers actually costing you? Token budget + duplicate-server detection for Claude Desktop, Claude Code, Cursor and VS Code.",
+  "keywords": ["mcp", "model-context-protocol", "claude", "claude-code", "cursor", "ai-agents", "context-window", "token-budget", "cli"],
+  "license": "MIT",
+  "type": "module",
+  "author": "Ereb-Blade",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ereb-Blade/mcp-tollbooth.git"
+  },
+  "homepage": "https://github.com/Ereb-Blade/mcp-tollbooth#readme",
+  "bugs": {
+    "url": "https://github.com/Ereb-Blade/mcp-tollbooth/issues"
+  },
+  "bin": {
+    "mcp-tollbooth": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"try{require('fs').chmodSync('dist/index.js',0o755)}catch(e){}\"",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}
