@@ -1,12 +1,12 @@
-# MCP Tollbooth 🧾
+# MCP Tollbooth 
 
 **How much context window are your MCP servers actually costing you — and are any of them doing the same job twice?**
 
 MCP Tollbooth scans your local [Model Context Protocol](https://modelcontextprotocol.io) configuration (Claude Desktop, Claude Code, Cursor, VS Code) and answers two questions nobody else is answering well:
 
-- 🧮 **Token budget** — how many tokens each server silently costs you before your agent does anything useful, and what the total toll is across your whole setup
-- 🔁 **Overlap detection** — do you have three different servers all fighting to do "GitHub stuff"? Pick one, save the budget.
-- 🔒 A lightweight **trust signal** (repo activity, stars, license) as a secondary check, clearly labeled as a heuristic — not a security scanner
+-  **Token budget** — how many tokens each server silently costs you before your agent does anything useful, and what the total toll is across your whole setup
+-  **Overlap detection** — do you have three different servers all fighting to do "GitHub stuff"? Pick one, save the budget.
+-  A lightweight **trust signal** (repo activity, stars, license) as a secondary check, clearly labeled as a heuristic — not a security scanner
 
 ## Why this, and not a security scanner
 
