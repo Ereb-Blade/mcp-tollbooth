@@ -1,5 +1,5 @@
 import { categorize, estimateTokens } from "./heuristics.js";
-import { classifyServer, fetchGithubRepoInfo, fetchNpmPackageInfo } from "./registryInfo.js";
+import { classifyServer, fetchGithubRepoInfo, fetchNpmPackageInfo, KNOWN_UVX_SERVER_REPOS } from "./registryInfo.js";
 import type { GithubLookupResult } from "./registryInfo.js";
 import type { AuditReport, DiscoveredConfigFile, RawMcpServerConfig, ServerAudit } from "./types.js";
 
@@ -96,9 +96,15 @@ export async function auditConfigFiles(configFiles: DiscoveredConfigFile[]): Pro
       let packageInfo;
       let githubLookup: GithubLookupResult | undefined;
 
-      if (packageName) {
+      if (packageName && kind === "npx-package") {
         packageInfo = (await fetchNpmPackageInfo(packageName)) ?? { name: packageName };
         githubLookup = await fetchGithubRepoInfo(packageInfo.repositoryUrl);
+      } else if (packageName && kind === "uvx-package") {
+        // No PyPI metadata fetcher yet — only cross-check against the known-good
+        // PyPI repo map (never the npm one; see KNOWN_UVX_SERVER_REPOS comment).
+        packageInfo = { name: packageName };
+        const knownRepo = KNOWN_UVX_SERVER_REPOS[packageName];
+        githubLookup = knownRepo ? await fetchGithubRepoInfo(knownRepo) : { status: "not-found" };
       }
 
       const { tokens, confidence } = estimateTokens(packageName, kind);

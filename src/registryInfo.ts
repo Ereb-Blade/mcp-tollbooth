@@ -3,6 +3,42 @@ import type { GithubRepoInfo, PackageInfo, RawMcpServerConfig, ServerKind } from
 const NPM_REGISTRY = "https://registry.npmjs.org";
 const GITHUB_API = "https://api.github.com";
 
+/**
+ * Fallback GitHub repo for packages whose npm registry metadata is missing (or
+ * inconsistent about) a `repository` field. Verified by hand against the live
+ * registry — several official @modelcontextprotocol/* packages simply don't
+ * publish this field even though they live in a real, well-known monorepo, and
+ * without this map their trust score always reads "no repo found" regardless of
+ * how well-maintained the actual project is.
+ */
+const KNOWN_SERVER_REPOS: Record<string, string> = {
+  "@modelcontextprotocol/server-github": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-slack": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-postgres": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-puppeteer": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-brave-search": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-google-maps": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-everart": "https://github.com/modelcontextprotocol/servers",
+  "@modelcontextprotocol/server-redis": "https://github.com/modelcontextprotocol/servers",
+  "@cloudflare/mcp-server-cloudflare": "https://github.com/cloudflare/mcp-server-cloudflare",
+};
+
+/**
+ * Repo fallback for known **uvx/pipx** (PyPI) packages only. Deliberately kept
+ * separate from KNOWN_SERVER_REPOS above: "mcp-server-fetch" and
+ * "mcp-server-sqlite" are real PyPI package names, but those exact strings are
+ * ALSO squattable (or already squatted — see e.g. the "npx confusion" security
+ * research canary published to npm under the literal name "mcp-server-fetch").
+ * If a config invokes a same-named package via `npx` instead of `uvx`, it is a
+ * *different* package in a *different* registry, and must never inherit this
+ * trust/repo mapping. Kind separation in classifyServer() is what keeps these
+ * two lookups from colliding.
+ */
+export const KNOWN_UVX_SERVER_REPOS: Record<string, string> = {
+  "mcp-server-fetch": "https://github.com/modelcontextprotocol/servers",
+  "mcp-server-sqlite": "https://github.com/modelcontextprotocol/servers",
+};
+
 /** Figures out roughly what kind of server this is, and pulls out an npm package name if present. */
 export function classifyServer(cfg: RawMcpServerConfig): { kind: ServerKind; packageName?: string; rawCommandLine: string } {
   if (cfg.url) {
@@ -22,9 +58,13 @@ export function classifyServer(cfg: RawMcpServerConfig): { kind: ServerKind; pac
   }
 
   if (command === "uvx" || command === "pipx") {
+    // Separate kind from npx: uvx/pipx pull from PyPI, not npm. Same package-name
+    // string can refer to two completely unrelated packages across the two
+    // registries (see the KNOWN_UVX_SERVER_REPOS comment), so these must never
+    // be looked up against the npm registry as if they were npx packages.
     const pkg = args.find((a) => !a.startsWith("-"));
     if (pkg) {
-      return { kind: "npx-package", packageName: stripVersion(pkg), rawCommandLine };
+      return { kind: "uvx-package", packageName: stripVersion(pkg), rawCommandLine };
     }
   }
 
@@ -61,7 +101,9 @@ export async function fetchNpmPackageInfo(packageName: string): Promise<PackageI
     const latestVersion = data["dist-tags"]?.latest;
     const versionData = latestVersion ? data.versions?.[latestVersion] : undefined;
     const repository = versionData?.repository ?? data.repository;
-    const repoUrl = typeof repository === "string" ? repository : repository?.url;
+    const repoUrl =
+      (typeof repository === "string" ? repository : repository?.url) ??
+      KNOWN_SERVER_REPOS[packageName];
     return {
       name: packageName,
       version: latestVersion,

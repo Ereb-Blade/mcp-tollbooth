@@ -12,7 +12,7 @@ export interface DiscoveredConfigFile {
   servers: Record<string, RawMcpServerConfig>;
 }
 
-export type ServerKind = "npx-package" | "remote-http" | "local-binary" | "unknown";
+export type ServerKind = "npx-package" | "uvx-package" | "remote-http" | "local-binary" | "unknown";
 
 export interface PackageInfo {
   name?: string;
