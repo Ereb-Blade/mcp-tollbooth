@@ -15,7 +15,7 @@
     "url": "https://github.com/Ereb-Blade/mcp-tollbooth/issues"
   },
   "bin": {
-    "mcp-tollbooth": "./dist/index.js"
+    "mcp-tollbooth": "dist/index.js"
   },
   "files": [
     "dist"
