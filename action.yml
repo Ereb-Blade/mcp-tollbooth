@@ -1,0 +1,35 @@
+name: "MCP Tollbooth"
+description: "Fail CI when a repo's MCP server config exceeds a context-window token budget, and flag duplicate/overlapping servers."
+author: "Ereb-Blade"
+branding:
+  icon: "credit-card"
+  color: "purple"
+
+inputs:
+  config:
+    description: "Path to the MCP config file to audit (e.g. .mcp.json). If omitted, mcp-tollbooth auto-discovers standard locations."
+    required: false
+  max-tokens:
+    description: "Fail the check if total estimated tokens exceed this number. Omit to only report, never fail."
+    required: false
+  github-token:
+    description: "GitHub token used for repo-activity trust lookups (raises the unauthenticated 60/hour rate limit). Defaults to the workflow's own GITHUB_TOKEN."
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run mcp-tollbooth
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        ARGS=""
+        if [ -n "${{ inputs.config }}" ]; then
+          ARGS="$ARGS --config ${{ inputs.config }}"
+        fi
+        if [ -n "${{ inputs.max-tokens }}" ]; then
+          ARGS="$ARGS --max-tokens ${{ inputs.max-tokens }}"
+        fi
+        npx --yes mcp-tollbooth $ARGS

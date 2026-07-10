@@ -1,4 +1,9 @@
-# MCP Tollbooth 
+# MCP Tollbooth
+
+[![npm version](https://img.shields.io/npm/v/mcp-tollbooth.svg)](https://www.npmjs.com/package/mcp-tollbooth)
+[![npm downloads](https://img.shields.io/npm/dw/mcp-tollbooth.svg)](https://www.npmjs.com/package/mcp-tollbooth)
+[![CI](https://github.com/Ereb-Blade/mcp-tollbooth/actions/workflows/ci.yml/badge.svg)](https://github.com/Ereb-Blade/mcp-tollbooth/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/npm/l/mcp-tollbooth.svg)](./LICENSE)
 
 **How much context window are your MCP servers actually costing you — and are any of them doing the same job twice?**
 
@@ -40,6 +45,21 @@ Raw JSON for scripting / CI:
 npx mcp-tollbooth --json
 ```
 
+### CI: fail a build over budget
+
+```bash
+npx mcp-tollbooth --config .mcp.json --max-tokens 20000
+```
+
+Exits `1` if the total estimated toll goes over the number you set — nothing to parse, just a pass/fail gate. Or use the bundled GitHub Action directly:
+
+```yaml
+- uses: Ereb-Blade/mcp-tollbooth@main
+  with:
+    config: .mcp.json
+    max-tokens: 20000
+```
+
 ### Example output
 
 ```
@@ -79,10 +99,21 @@ Total context toll: ~7,300 tokens  across 4 server(s)  ·  avg trust 72/100
 
 ## Roadmap
 
+- [x] GitHub Action for CI-time token-budget regression checks on team MCP configs (`--max-tokens`, `action.yml`)
 - [ ] `--precise` live connection mode for exact token counts (connect and count real tool schemas)
 - [ ] `--fix` mode to interactively disable low-value / redundant servers
-- [ ] GitHub Action for CI-time token-budget regression checks on team MCP configs
 - [ ] Per-server historical token trend (did that update just double your bill?)
+
+## Development
+
+```bash
+npm install
+npm run build
+npm test        # builds first (pretest), then runs the vitest suite
+npm run dev -- --config test-configs/demo.mcp.json   # run from source without building
+```
+
+CI runs the same build + test on every push/PR across Node 18/20/22 (see `.github/workflows/ci.yml`).
 
 ## Contributing
 
