@@ -113,7 +113,7 @@ npm test        # builds first (pretest), then runs the vitest suite
 npm run dev -- --config test-configs/demo.mcp.json   # run from source without building
 ```
 
-CI runs the same build + test on every push/PR across Node 18/20/22 (see `.github/workflows/ci.yml`).
+The published CLI itself supports Node >=18. The test suite (vitest 4) requires Node >=20 — CI runs build + test on Node 20/22 accordingly (see `.github/workflows/ci.yml`).
 
 ## Contributing
 
