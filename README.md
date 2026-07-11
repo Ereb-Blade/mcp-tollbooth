@@ -15,7 +15,7 @@ MCP Tollbooth scans your local [Model Context Protocol](https://modelcontextprot
 
 ## Why this, and not a security scanner
 
-By mid-2026 the MCP ecosystem has real security tooling already: [`@wigu/mcp-doctor`](https://www.npmjs.com/package/@wigu/mcp-doctor) does secret-leak and permission scanning with a GitHub Action; other tools do agent-friendliness diagnostics. That space is getting crowded, and doing it shallowly wouldn't add much.
+By mid-2026 the MCP ecosystem already has security tooling — secret-leak scanning, permission auditing, agent-friendliness diagnostics. That space is getting crowded, and doing it shallowly wouldn't add much.
 
 What's still missing is the boring-but-real cost problem: **every server you add eats context before your agent types a word.** A handful of servers can burn 50,000+ tokens of budget, and most people have no idea which ones are the expensive ones — or that they've installed the same capability twice under two different names. Tollbooth answers exactly that, and nothing more than that, well.
 
@@ -89,7 +89,7 @@ Total context toll: ~7,300 tokens  across 4 server(s)  ·  avg trust 72/100
 
 **Overlap detection** groups servers by inferred category (vcs, filesystem, browser-automation, etc.) and flags any category with more than one server.
 
-**Trust score** (0-100) is a secondary, clearly-labeled heuristic: official npm scope, days since last commit, GitHub stars, archived status, license presence. It is not a security scan — it doesn't read source code, run the server, or detect malicious behavior. If you want real security scanning, use a dedicated tool for that (see above).
+**Trust score** (0-100) is a secondary, clearly-labeled heuristic: official npm scope, days since last commit, GitHub stars, archived status, license presence. It is not a security scan — it doesn't read source code, run the server, or detect malicious behavior. If you want real security scanning, that's a separate category of tool.
 
 ## Limitations
 
