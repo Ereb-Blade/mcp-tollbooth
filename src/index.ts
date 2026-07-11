@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { auditConfigFiles } from "./auditor.js";
 import { discoverConfigFiles, ExplicitConfigError } from "./configLocator.js";
+import { runFixWizard } from "./fixInteractive.js";
 import {
   printBanner,
   printDiscoveredFiles,
@@ -25,7 +26,14 @@ program
   .option("-c, --config <path>", "path to a specific MCP config file to audit")
   .option("--json", "output raw JSON instead of a formatted report")
   .option("--max-tokens <n>", "exit with code 1 if total estimated tokens exceed this budget (for CI use)", (v) => parseInt(v, 10))
-  .action(async (opts: { config?: string; json?: boolean; maxTokens?: number }) => {
+  .option("--fix", "interactively disable overlapping / low-trust servers (writes a backup before touching any config)")
+  .action(async (opts: { config?: string; json?: boolean; maxTokens?: number; fix?: boolean }) => {
+    if (opts.fix && opts.json) {
+      console.log(chalk.red("✗ --fix is interactive and can't be combined with --json."));
+      process.exitCode = 1;
+      return;
+    }
+
     let configFiles;
     try {
       configFiles = discoverConfigFiles(opts.config);
@@ -63,6 +71,12 @@ program
       console.log(JSON.stringify(report, null, 2));
     } else {
       printReport(report);
+    }
+
+    if (opts.fix) {
+      console.log("");
+      await runFixWizard(report, configFiles);
+      return;
     }
 
     if (opts.maxTokens !== undefined) {

@@ -4,6 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dw/mcp-tollbooth.svg)](https://www.npmjs.com/package/mcp-tollbooth)
 [![CI](https://github.com/Ereb-Blade/mcp-tollbooth/actions/workflows/ci.yml/badge.svg)](https://github.com/Ereb-Blade/mcp-tollbooth/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/npm/l/mcp-tollbooth.svg)](./LICENSE)
+[![Telegram](https://img.shields.io/badge/Telegram-MCP--TollBoth-26A5E4?logo=telegram&logoColor=white)](https://t.me/mcpserverdie)
 
 **How much context window are your MCP servers actually costing you — and are any of them doing the same job twice?**
 
@@ -60,6 +61,21 @@ Exits `1` if the total estimated toll goes over the number you set — nothing t
     max-tokens: 20000
 ```
 
+### `--fix`: clean up overlap and low-trust servers interactively
+
+```bash
+npx mcp-tollbooth --fix
+```
+
+Runs the same audit, then walks you through what's worth disabling:
+
+- **Overlapping servers** (same category, e.g. two `vcs` servers) — pre-selects the lower-trust one(s) to disable, keeps the best one.
+- **Low-trust servers** — anything scoring under 50 that wasn't already covered above.
+
+You pick exactly what to disable with the arrow keys, see a plain-text diff of what's about to change, and nothing touches disk until you explicitly confirm. Every config file it edits gets a timestamped `.bak-<epoch>` backup saved right next to it first, and every other key in the file (settings, unrelated servers, formatting) is left untouched — only the selected servers are removed from the servers list.
+
+Not compatible with `--json` (it's interactive by nature).
+
 ### Example output
 
 ```
@@ -101,7 +117,7 @@ Total context toll: ~7,300 tokens  across 4 server(s)  ·  avg trust 72/100
 
 - [x] GitHub Action for CI-time token-budget regression checks on team MCP configs (`--max-tokens`, `action.yml`)
 - [ ] `--precise` live connection mode for exact token counts (connect and count real tool schemas)
-- [ ] `--fix` mode to interactively disable low-value / redundant servers
+- [x] `--fix` mode to interactively disable low-value / redundant servers
 - [ ] Per-server historical token trend (did that update just double your bill?)
 
 ## Development
@@ -122,3 +138,9 @@ Issues and PRs welcome — especially the known-server token cost table in `src/
 ## License
 
 MIT
+
+---
+
+Updates & discussion: [Telegram — MCP-TollBoth](https://t.me/mcpserverdie)
+
+If Tollbooth saved you some context budget, a star helps other people find it.
